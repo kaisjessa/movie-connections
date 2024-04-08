@@ -5,6 +5,7 @@ import {
   getDoc,
   getDocs,
   setDoc,
+  Timestamp,
 } from "firebase/firestore";
 import {
   Movie,
@@ -14,13 +15,21 @@ import {
 } from "@/app/firebase/types";
 import { firebase_db } from "@/app/firebase/config";
 
-export const getPuzzles = async () => {
+// gets all puzzle header data from firebase
+export const getPuzzles = async (): Promise<PuzzleHeader[]> => {
   const querySnapshot = await getDocs(collection(firebase_db, "puzzles"));
-  const puzzles = querySnapshot.docs.map((doc) => doc.data());
-  return puzzles;
+  const puzzleHeaders = querySnapshot.docs.map((p) => {
+    return {
+      id: p.id,
+      name: p.data().name,
+      author: p.data().author,
+      timestamp: p.data().timestamp,
+    };
+  });
+  return puzzleHeaders;
 };
 
-export const setMovie = async (movie: Movie) => {
+export const setMovie = async (movie: Movie): Promise<void> => {
   await setDoc(doc(firebase_db, "movies", movie.id.toString()), {
     title: movie.title,
     backdrop: movie.backdrop,
@@ -33,7 +42,13 @@ export const getMovie = async (id: string) => {
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {
-    return docSnap.data();
+    const tempMovie: Movie = {
+      id: docSnap.data().id,
+      title: docSnap.data().title,
+      backdrop: docSnap.data().backdrop,
+      poster: docSnap.data().poster,
+    };
+    return tempMovie;
   } else {
     return null;
   }
@@ -54,7 +69,7 @@ export const getPuzzle = async (id: string) => {
 
 /*
   Converts data from firebase to Puzzle
-  Converts inner data from firebase to Movie
+  Converts inner data from firebase to Movie using getMovie()
 */
 export const dataToPuzzle = async (puzzleData: DocumentData) => {
   const pHeader: PuzzleHeader = {
@@ -71,16 +86,8 @@ export const dataToPuzzle = async (puzzleData: DocumentData) => {
       movies: [],
     };
     for (const m of c.movies) {
-      const movieData = await getMovie(m.id.toString());
-      if (movieData) {
-        const tempMovie: Movie = {
-          id: movieData.id,
-          title: movieData.title,
-          backdrop: movieData.backdrop,
-          poster: movieData.poster,
-        };
-        temp.movies.push(tempMovie);
-      }
+      const tempMovie = await getMovie(m.id.toString());
+      if (tempMovie) temp.movies.push(tempMovie);
     }
     pContents.push(temp);
   }

@@ -22,9 +22,11 @@ type puzzle = {
 };
 
 export default async function Home() {
-  // const newPuzzleRef = doc(collection(firebase_db, "puzzles"));
-  // const data = getData(firebase_db);
+  // for (let i = 0; i < 10; i++) {
+  //   const newPuzzleRef = doc(collection(firebase_db, "puzzles"));
+  //   const data = getData(firebase_db, i.toString());
+  //   await setDoc(newPuzzleRef, data);
+  // }
 
-  // await setDoc(newPuzzleRef, data);
   return <div>Hello</div>;
 }

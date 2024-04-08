@@ -8,7 +8,7 @@ export type Movie = {
 };
 
 export type PuzzleHeader = {
-  id: number;
+  id: string;
   name: string;
   author: string;
   timestamp: Timestamp;

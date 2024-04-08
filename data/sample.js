@@ -1,9 +1,8 @@
 import { doc, collection, serverTimestamp } from "firebase/firestore";
 
-export const getData = (db) => {
+export const getData = (db, title) => {
   return {
-    id: 1,
-    name: "My first puzzle",
+    name: "My puzzle" + title,
     author: "Kais",
     timestamp: serverTimestamp(),
     contents: [
