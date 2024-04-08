@@ -5,9 +5,9 @@ import NotFound from "@/app/not-found";
 const displayPuzzle = (newPuzzle: Puzzle) => {
   return (
     <div>
-      <h1>{newPuzzle.name}</h1>
-      <h2>{newPuzzle.author}</h2>
-      <h3>{newPuzzle.timestamp.toDate().toString()}</h3>
+      <h1>{newPuzzle.header.name}</h1>
+      <h2>{newPuzzle.header.author}</h2>
+      <h3>{newPuzzle.header.timestamp.toDate().toString()}</h3>
 
       {newPuzzle.contents.map((c, j) => (
         <div key={j}>

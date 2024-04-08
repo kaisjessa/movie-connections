@@ -1,6 +1,24 @@
-import { doc, DocumentData, getDoc, setDoc } from "firebase/firestore";
-import { Movie, Puzzle } from "@/app/firebase/types";
+import {
+  collection,
+  doc,
+  DocumentData,
+  getDoc,
+  getDocs,
+  setDoc,
+} from "firebase/firestore";
+import {
+  Movie,
+  Puzzle,
+  PuzzleHeader,
+  PuzzleContents,
+} from "@/app/firebase/types";
 import { firebase_db } from "@/app/firebase/config";
+
+export const getPuzzles = async () => {
+  const querySnapshot = await getDocs(collection(firebase_db, "puzzles"));
+  const puzzles = querySnapshot.docs.map((doc) => doc.data());
+  return puzzles;
+};
 
 export const setMovie = async (movie: Movie) => {
   await setDoc(doc(firebase_db, "movies", movie.id.toString()), {
@@ -39,7 +57,14 @@ export const getPuzzle = async (id: string) => {
   Converts inner data from firebase to Movie
 */
 export const dataToPuzzle = async (puzzleData: DocumentData) => {
-  let contents: Array<{ category: string; movies: Movie[] }> = [];
+  const pHeader: PuzzleHeader = {
+    id: puzzleData.id,
+    name: puzzleData.name,
+    author: puzzleData.author,
+    timestamp: puzzleData.timestamp,
+  };
+
+  let pContents: PuzzleContents = [];
   for (const c of puzzleData.contents) {
     let temp: { category: string; movies: Movie[] } = {
       category: c.category,
@@ -57,14 +82,12 @@ export const dataToPuzzle = async (puzzleData: DocumentData) => {
         temp.movies.push(tempMovie);
       }
     }
-    contents.push(temp);
+    pContents.push(temp);
   }
+
   const newPuzzle: Puzzle = {
-    id: puzzleData.id,
-    name: puzzleData.name,
-    author: puzzleData.author,
-    timestamp: puzzleData.timestamp,
-    contents: contents,
+    header: pHeader,
+    contents: pContents,
   };
 
   return newPuzzle;

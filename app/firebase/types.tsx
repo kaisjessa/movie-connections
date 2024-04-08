@@ -7,10 +7,16 @@ export type Movie = {
   poster: string;
 };
 
-export type Puzzle = {
+export type PuzzleHeader = {
   id: number;
   name: string;
   author: string;
   timestamp: Timestamp;
-  contents: Array<{ category: string; movies: Movie[] }>;
+};
+
+export type PuzzleContents = Array<{ category: string; movies: Movie[] }>;
+
+export type Puzzle = {
+  header: PuzzleHeader;
+  contents: PuzzleContents;
 };
