@@ -11,7 +11,15 @@ const Browse = async () => {
           <div key={i}>
             <h1>{p.name}</h1>
             <h2>{p.author}</h2>
-            <h3>{p.timestamp.toDate().toString()}</h3>
+            <h3>
+              {p.timestamp.toDate().toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+              })}
+            </h3>
             <Link href={`/puzzles/${p.id}`}>View</Link>
           </div>
         );
