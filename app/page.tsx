@@ -10,7 +10,7 @@ import {
   serverTimestamp,
   FieldValue,
 } from "firebase/firestore";
-import { setUpFirebase, writeMovie } from "@/app/firebase";
+import { firebase_db } from "@/app/firebase/config";
 import { getData } from "../data/sample";
 
 type puzzle = {
@@ -22,10 +22,9 @@ type puzzle = {
 };
 
 export default async function Home() {
-  const db = setUpFirebase();
-  const newPuzzleRef = doc(collection(db, "puzzles"));
-  const data = getData(db);
+  // const newPuzzleRef = doc(collection(firebase_db, "puzzles"));
+  // const data = getData(firebase_db);
 
-  await setDoc(newPuzzleRef, data);
+  // await setDoc(newPuzzleRef, data);
   return <div>Hello</div>;
 }
