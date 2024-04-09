@@ -6,6 +6,10 @@ import {
   getDocs,
   setDoc,
   Timestamp,
+  query,
+  orderBy,
+  limit,
+  startAfter,
 } from "firebase/firestore";
 import {
   Movie,
@@ -16,8 +20,17 @@ import {
 import { firebase_db } from "@/app/firebase/config";
 
 // gets all puzzle header data from firebase
-export const getPuzzles = async (): Promise<PuzzleHeader[]> => {
-  const querySnapshot = await getDocs(collection(firebase_db, "puzzles"));
+export const getPuzzles = async (
+  lim: number,
+  lastId: string
+): Promise<PuzzleHeader[]> => {
+  const puzzleRef = collection(firebase_db, "puzzles");
+  const q = query(
+    puzzleRef,
+    orderBy("timestamp", "desc"),
+    limit(lim >= 1 ? lim : 1)
+  );
+  const querySnapshot = await getDocs(q);
   const puzzleHeaders = querySnapshot.docs.map((p) => {
     return {
       id: p.id,
@@ -99,3 +112,6 @@ export const dataToPuzzle = async (puzzleData: DocumentData) => {
 
   return newPuzzle;
 };
+function offset(start: number): import("@firebase/firestore").QueryConstraint {
+  throw new Error("Function not implemented.");
+}
