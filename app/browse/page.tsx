@@ -7,10 +7,9 @@ const Browse = async ({
 }: {
   searchParams: { lastId: string };
 }) => {
-  let lastId = searchParams.lastId || "";
-  const perPage = 1;
+  const perPage = 25;
 
-  let puzzleData = await getPuzzles(perPage, lastId);
+  let puzzleData = await getPuzzles(perPage);
   return (
     <div>
       <div>
@@ -46,9 +45,9 @@ const Browse = async ({
         >
           Previous
         </Link> */}
-        <Link className="join-item btn btn-outline" href={`?lastId=${lastId}`}>
+        {/* <Link className="join-item btn btn-outline" href={`?lastId=${lastId}`}>
           Next
-        </Link>
+        </Link> */}
       </div>
     </div>
   );

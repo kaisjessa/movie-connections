@@ -20,10 +20,7 @@ import {
 import { firebase_db } from "@/app/firebase/config";
 
 // gets all puzzle header data from firebase
-export const getPuzzles = async (
-  lim: number,
-  lastId: string
-): Promise<PuzzleHeader[]> => {
+export const getPuzzles = async (lim: number): Promise<PuzzleHeader[]> => {
   const puzzleRef = collection(firebase_db, "puzzles");
   const q = query(
     puzzleRef,
@@ -84,7 +81,9 @@ export const getPuzzle = async (id: string) => {
   Converts data from firebase to Puzzle
   Converts inner data from firebase to Movie using getMovie()
 */
-export const dataToPuzzle = async (puzzleData: DocumentData) => {
+export const dataToPuzzle = async (
+  puzzleData: DocumentData
+): Promise<Puzzle> => {
   const pHeader: PuzzleHeader = {
     id: puzzleData.id,
     name: puzzleData.name,
@@ -99,8 +98,11 @@ export const dataToPuzzle = async (puzzleData: DocumentData) => {
       movies: [],
     };
     for (const m of c.movies) {
-      const tempMovie = await getMovie(m.id.toString());
-      if (tempMovie) temp.movies.push(tempMovie);
+      const tempMovie = await getMovie(m.id);
+      if (tempMovie) {
+        tempMovie.id = parseInt(m.id);
+        temp.movies.push(tempMovie as Movie);
+      }
     }
     pContents.push(temp);
   }
@@ -112,6 +114,3 @@ export const dataToPuzzle = async (puzzleData: DocumentData) => {
 
   return newPuzzle;
 };
-function offset(start: number): import("@firebase/firestore").QueryConstraint {
-  throw new Error("Function not implemented.");
-}
