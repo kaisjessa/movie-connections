@@ -5,3 +5,10 @@
 .header-btn {
   @apply btn btn-ghost text-sm;
 }
+
+.libre-franklin-400 {
+  font-family: "Libre Franklin", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}

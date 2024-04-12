@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "./components/header";
 import Footer from "./components/footer";
-import { Noto_Sans } from "next/font/google";
+import { Inter } from "next/font/google";
 
-export const noto_sans = Noto_Sans({
+const inter = Inter({
   subsets: ["latin"],
   display: "swap",
 });
@@ -18,8 +18,14 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" data-theme="sunset" className={noto_sans.className}>
-      <body>
+    <html lang="en" data-theme="sunset">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,100..900;1,100..900&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="libre-franklin-400">
         <Header />
         {children}
         {/* <Footer /> */}
