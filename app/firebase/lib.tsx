@@ -22,11 +22,7 @@ import { firebase_db } from "@/app/firebase/config";
 // gets all puzzle header data from firebase
 export const getPuzzles = async (lim: number): Promise<PuzzleHeader[]> => {
   const puzzleRef = collection(firebase_db, "puzzles");
-  const q = query(
-    puzzleRef,
-    orderBy("timestamp", "desc"),
-    limit(lim >= 1 ? lim : 1)
-  );
+  const q = query(puzzleRef, orderBy("timestamp", "desc"), limit(25));
   const querySnapshot = await getDocs(q);
   const puzzleHeaders = querySnapshot.docs.map((p) => {
     return {

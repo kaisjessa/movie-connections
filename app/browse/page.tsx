@@ -2,11 +2,7 @@ import React from "react";
 import { getPuzzles } from "@/app/firebase/lib";
 import Link from "next/link";
 
-const Browse = async ({
-  searchParams,
-}: {
-  searchParams: { lastId: string };
-}) => {
+const Browse = async () => {
   const perPage = 25;
 
   let puzzleData = await getPuzzles(perPage);
