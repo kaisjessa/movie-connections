@@ -5,34 +5,41 @@ import { Timestamp } from "firebase/firestore";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-const shuffle = (array: Movie[]): Movie[] => {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-};
+// const shuffle = (array: Movie[]) => {
+//   for (let i = array.length - 1; i > 0; i--) {
+//     const j = Math.floor(Math.random() * (i + 1));
+//     [array[i], array[j]] = [array[j], array[i]];
+//   }
+//   return array;
+// };
 
 const updateSelected = (selected: string[], title: string): string[] => {
-  if (selected.includes(title)) {
-    return selected.filter((i) => i !== title);
-  } else if (selected.length === 4) {
-    return selected;
-  } else {
-    return [...selected, title];
-  }
+  if (selected.includes(title)) return selected.filter((i) => i !== title);
+  if (selected.length === 4) return selected;
+  return [...selected, title];
 };
 
 const PuzzlePiece = (props: { movie: Movie }) => {
+  const [loading, setLoading]: [boolean, any] = useState(true);
   return (
     <figure className="w-full h-auto">
+      {loading && <span className="loading loading-dots loading-xs"></span>}
       <Image
         src={props.movie.poster}
         alt={props.movie.title}
         width={100}
         height={100}
+        onLoad={() => setLoading(false)}
       />
     </figure>
+  );
+};
+
+const PuzzleLoading = () => {
+  return (
+    <>
+      <p>Loading...</p>
+    </>
   );
 };
 
@@ -40,37 +47,61 @@ const DisplayPuzzle = (props: { data: Puzzle }) => {
   const puzzleHeader = props.data.header;
   const puzzleContents = props.data.contents;
   const puzzleTime = new Date(puzzleHeader.timestamp.seconds * 1000);
-  const movies = shuffle(puzzleContents.map((c) => c.movies).flat());
-  const [movieList, setMovies] = useState(movies);
+  const [movieList, setMovies]: [Movie[], any] = useState([]);
   const [selected, setSelected]: [string[], any] = useState([]);
+  const [loaded, isLoaded]: [boolean, any] = useState(false);
 
   useEffect(() => {
     console.log(selected);
   }, [selected]);
 
+  useEffect(() => {
+    setMovies(
+      puzzleContents
+        .map((c) => c.movies)
+        .flat()
+        .slice()
+        .sort(() => Math.random() - 0.5)
+    );
+  }, [puzzleContents]);
+
+  useEffect(() => {
+    isLoaded(true);
+  }, [movieList]);
+
   return (
     <div>
       <div className="grid grid-cols-4 grid-flow-row gap-4 m-2">
-        {movieList.map(function (movie: Movie, id: number) {
-          return (
-            <button
-              className={
-                selected.includes(movie.title) ? "opacity-50" : "opacity-100"
-              }
-              key={id}
-              onClick={() => setSelected(updateSelected(selected, movie.title))}
-            >
-              <PuzzlePiece movie={movie} />
-            </button>
-          );
-        })}
+        {loaded &&
+          movieList.map(function (movie: Movie, id: number) {
+            return (
+              <button
+                className={
+                  selected.includes(movie.title) ? "opacity-50" : "opacity-100"
+                }
+                key={id}
+                onClick={() =>
+                  setSelected(updateSelected(selected, movie.title))
+                }
+              >
+                <PuzzlePiece movie={movie} />
+              </button>
+            );
+          })}
+        {loaded || <PuzzleLoading />}
       </div>
       <div className="pt-4">
         <button
           className="btn btn-primary m-1"
           onClick={() => {
-            setSelected([]);
-            setMovies(shuffle(movies));
+            selected.length > 0 ? setSelected([]) : null;
+            setMovies(
+              puzzleContents
+                .map((c) => c.movies)
+                .flat()
+                .slice()
+                .sort(() => Math.random() - 0.5)
+            );
           }}
         >
           Shuffle
