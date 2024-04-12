@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Movie, Puzzle } from "../firebase/types";
+import { Movie, Puzzle, PuzzleContents } from "../firebase/types";
 import { Timestamp } from "firebase/firestore";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -19,10 +19,25 @@ const updateSelected = (selected: string[], title: string): string[] => {
   return [...selected, title];
 };
 
+const arraysEqual = (a: string[], b: string[]) => {
+  return a.every((v) => b.includes(v)) && b.every((v) => a.includes(v));
+};
+
+const checkCorrect = (selected: string[], contents: PuzzleContents) => {
+  console.log(selected);
+  for (const c of contents) {
+    const category = c.category;
+    const movies = c.movies.map((m) => m.title);
+    console.log(movies);
+    if (arraysEqual(selected, movies)) return [category, movies];
+  }
+  return [];
+};
+
 const PuzzlePiece = (props: { movie: Movie }) => {
   const [loading, setLoading]: [boolean, any] = useState(true);
   return (
-    <figure className="w-full h-auto">
+    <div className="w-full h-auto">
       {loading && <span className="loading loading-dots loading-xs"></span>}
       <Image
         src={props.movie.poster}
@@ -31,7 +46,7 @@ const PuzzlePiece = (props: { movie: Movie }) => {
         height={100}
         onLoad={() => setLoading(false)}
       />
-    </figure>
+    </div>
   );
 };
 
@@ -47,33 +62,43 @@ const DisplayPuzzle = (props: { data: Puzzle }) => {
   const puzzleHeader = props.data.header;
   const puzzleContents = props.data.contents;
   const puzzleTime = new Date(puzzleHeader.timestamp.seconds * 1000);
-  const [movieList, setMovies]: [Movie[], any] = useState([]);
+  const [movieOrder, setMovieOrder]: [Movie[], any] = useState([]);
   const [selected, setSelected]: [string[], any] = useState([]);
   const [loaded, isLoaded]: [boolean, any] = useState(false);
+  const [categoriesFound, setCategoriesFound]: [string[], any] = useState([]);
 
-  useEffect(() => {
-    console.log(selected);
-  }, [selected]);
+  const onSubmit = () => {
+    setSelected([]);
+    const result = checkCorrect(selected, puzzleContents);
+    if (result.length > 0) {
+      setCategoriesFound([...categoriesFound, result[0]]);
+    } else {
+      console.log("Incorrect. Try again.");
+    }
+  };
 
+  // load movies once they are ready
   useEffect(() => {
-    setMovies(
+    isLoaded(true);
+  }, [movieOrder]);
+
+  // update selectable movie list once category has been found
+  useEffect(() => {
+    setMovieOrder(
       puzzleContents
+        .filter((c) => !categoriesFound.includes(c.category))
         .map((c) => c.movies)
         .flat()
         .slice()
         .sort(() => Math.random() - 0.5)
     );
-  }, [puzzleContents]);
-
-  useEffect(() => {
-    isLoaded(true);
-  }, [movieList]);
+  }, [categoriesFound, puzzleContents]);
 
   return (
-    <div>
-      <div className="grid grid-cols-4 grid-flow-row gap-4 m-2">
+    <div className="flex flex-col items-center justify-center">
+      <div id="puzzle" className="grid grid-cols-4 grid-flow-row gap-2">
         {loaded &&
-          movieList.map(function (movie: Movie, id: number) {
+          movieOrder.map(function (movie: Movie, id: number) {
             return (
               <button
                 className={
@@ -90,13 +115,14 @@ const DisplayPuzzle = (props: { data: Puzzle }) => {
           })}
         {loaded || <PuzzleLoading />}
       </div>
-      <div className="pt-4">
+      <div id="buttons">
         <button
           className="btn btn-primary m-1"
           onClick={() => {
-            selected.length > 0 ? setSelected([]) : null;
-            setMovies(
+            setSelected([]);
+            setMovieOrder(
               puzzleContents
+                .filter((c) => !categoriesFound.includes(c.category))
                 .map((c) => c.movies)
                 .flat()
                 .slice()
@@ -109,12 +135,14 @@ const DisplayPuzzle = (props: { data: Puzzle }) => {
         <button className="btn btn-primary m-1" onClick={() => setSelected([])}>
           Deselect All
         </button>
-        <button className="btn btn-primary m-1">Submit</button>
+        <button className="btn btn-primary m-1" onClick={onSubmit}>
+          Submit
+        </button>
       </div>
-      <div>
-        <h1>{puzzleHeader.name}</h1>
-        <h2>{puzzleHeader.author}</h2>
-        <h3>{puzzleTime.toDateString()}</h3>
+      <div id="title" className="pl-2">
+        <h1 className="text-3xl font-bold">{puzzleHeader.name}</h1>
+        <h2 className="text-lg">Author: {puzzleHeader.author}</h2>
+        <h3 className="text-md">Created: {puzzleTime.toDateString()}</h3>
       </div>
     </div>
   );
