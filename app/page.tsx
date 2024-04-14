@@ -1,32 +1,52 @@
-import Image from "next/image";
-import { initializeApp } from "firebase/app";
-import {
-  collection,
-  getFirestore,
-  doc,
-  setDoc,
-  addDoc,
-  Firestore,
-  serverTimestamp,
-  FieldValue,
-} from "firebase/firestore";
-import { firebase_db } from "@/app/firebase/config";
-import { getData } from "../data/sample";
+import React from "react";
+import { getPuzzleHeaders } from "@/app/firebase/lib";
+import Link from "next/link";
 
-type puzzle = {
-  id: number;
-  name: string;
-  author: string;
-  timestamp: FieldValue;
-  contents: Array<{ category: string; movies: number[] }>;
+const Home = async () => {
+  const perPage = 25;
+
+  let puzzleData = await getPuzzleHeaders(perPage);
+  return (
+    <div>
+      <div>
+        {puzzleData.map((p, i) => {
+          return (
+            <div className="card w-96 bg-base-100 shadow-xl border-2" key={i}>
+              <div className="card-body">
+                <h1>{p.name}</h1>
+                <h2>{p.author}</h2>
+                <h3>
+                  {p.timestamp.toDate().toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                  })}
+                </h3>
+                <Link href={`/puzzles/${p.id}`}>View</Link>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="join grid grid-cols-2 w-1/2">
+        {/* <Link
+          className={
+            page > 1
+              ? "join-item btn btn-outline"
+              : "join-item btn-outline btn btn-disabled"
+          }
+          href={`?lastId=${page - 1}`}
+        >
+          Previous
+        </Link> */}
+        {/* <Link className="join-item btn btn-outline" href={`?lastId=${lastId}`}>
+          Next
+        </Link> */}
+      </div>
+    </div>
+  );
 };
 
-export default async function Home() {
-  // for (let i = 0; i < 10; i++) {
-  //   const newPuzzleRef = doc(collection(firebase_db, "puzzles"));
-  //   const data = getData(firebase_db, i.toString());
-  //   await setDoc(newPuzzleRef, data);
-  // }
-
-  return <div>Hello</div>;
-}
+export default Home;

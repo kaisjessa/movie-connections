@@ -1,0 +1,9 @@
+- [ ] game animations
+- [ ] right/wrong/1 away popups
+- [ ] game over popup w/ copy-paste
+- [ ] store guess squares
+- [x] change database to remove movie linking
+- [ ] fix browse in prod
+- [x] change home page to browse
+- [x] unit/integration tests
+- [ ] create puzzle with TMDB API
