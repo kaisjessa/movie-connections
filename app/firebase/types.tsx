@@ -6,6 +6,7 @@ export type Movie = {
   title: string;
   backdrop: string;
   poster: string;
+  year?: number;
 };
 
 export type PuzzleHeader = {

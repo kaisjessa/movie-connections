@@ -8,3 +8,5 @@
 - [x] unit/integration tests
 - [ ] create puzzle with TMDB API
 - [ ] display movie titles
+- [ ] better movie select animation
+- [ ] UI for md+

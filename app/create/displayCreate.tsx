@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Movie } from "tmdb-ts";
-import { GET } from "../api/tmdb/route";
+import { Movie } from "../firebase/types";
+import Image from "next/image";
 
 const CategoryField = (props: { row: number }) => {
   return (
@@ -13,23 +13,10 @@ const CategoryField = (props: { row: number }) => {
   );
 };
 
-const MovieField = (props: { row: number; col: number; f: any }) => {
-  return (
-    <input
-      type="text"
-      placeholder={"Movie " + props.col.toString()}
-      className="input input-bordered w-full"
-      onChange={(e) => props.f(e.target.value)}
-    />
-  );
-};
-
-const DisplayCreate = () => {
+const MovieField = (props: { func: Function }) => {
   const [userSearch, setUserSearch]: [string, any] = useState("");
   const [data, setData]: [Movie[], any] = useState([]);
-
   useEffect(() => {
-    console.log("userSearch: ", userSearch);
     const getData = async () => {
       if (userSearch.length === 0) {
         setData([]);
@@ -38,15 +25,53 @@ const DisplayCreate = () => {
       const movieData = await fetch(`/api/tmdb?query=${userSearch}`);
       const movies = await movieData.json();
       setData(movies);
-      console.log(movies);
     };
     getData();
   }, [userSearch]);
+
+  const onSelection = (m: Movie) => {
+    setUserSearch("");
+    setData([]);
+    props.func(m);
+  };
+
+  return (
+    <div className="dropdown dropdown-open">
+      <input
+        type="text"
+        placeholder={"Movie "}
+        className="input input-bordered"
+        value={userSearch}
+        onChange={(e) => setUserSearch(e.target.value)}
+      />
+      <ul
+        tabIndex={0}
+        className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+      >
+        {data.length > 0 &&
+          data.map((m, i) => (
+            <li key={i}>
+              <button onClick={() => onSelection(m)}>
+                <Image src={m.poster} alt={m.title} width={50} height={50} />
+                {m.title} {m.year ? "(" + m.year + ")" : ""}
+              </button>
+            </li>
+          ))}
+      </ul>
+    </div>
+  );
+};
+
+const DisplayCreate = () => {
+  const [selections, setSelections]: [Movie[], any] = useState([]);
+  const updateSelections = (m: Movie) => {
+    setSelections([...selections, m]);
+  };
   return (
     <div className="grid grid-cols-1">
-      <MovieField row={1} col={1} f={setUserSearch} />
-      {data.map((m, i) => (
-        <p key={i}>{m.title}</p>
+      <MovieField func={updateSelections} />
+      {selections.map((m, i) => (
+        <Image key={i} src={m.poster} alt={m.title} width={100} height={100} />
       ))}
     </div>
   );

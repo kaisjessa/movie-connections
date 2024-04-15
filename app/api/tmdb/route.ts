@@ -29,11 +29,12 @@ export async function GET(request: Request): Promise<Response> {
         title: movie.title,
         backdrop: baseUrl + movie.backdrop_path,
         poster: baseUrl + movie.poster_path,
+        year: parseInt(movie.release_date.slice(0, 4)),
       });
     }
     return new Response(JSON.stringify(movies));
   } catch (err) {
     console.log(err);
-    return new Response({ error: err });
+    return new Response(JSON.stringify([err]));
   }
 }
