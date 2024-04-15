@@ -11,8 +11,8 @@ const setSamplePuzzle = async () => {
 };
 
 const Create = () => {
-  const id = setSamplePuzzle();
-  return <div>id</div>;
+  // const id = setSamplePuzzle();
+  return <div>Coming soon...</div>;
 };
 
 export default Create;

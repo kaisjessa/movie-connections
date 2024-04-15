@@ -1,4 +1,4 @@
-import DisplayPuzzle from "@/app/components/displayPuzzle";
+import DisplayPuzzle from "./displayPuzzle";
 import { getPuzzleData } from "@/app/firebase/lib";
 import { Puzzle } from "@/app/firebase/types";
 import NotFound from "@/app/not-found";

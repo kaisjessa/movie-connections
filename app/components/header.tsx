@@ -1,14 +1,4 @@
 import React from "react";
-import { firebase_db } from "../firebase/config";
-import { getPuzzles } from "../firebase/lib";
-
-// const getRandomPuzzle = async () => {
-//   const puzzles = await getPuzzles(0);
-//   const puzzleIds = puzzles.map((puzzle) => puzzle.id);
-//   const randomIndex = Math.floor(Math.random() * puzzleIds.length);
-//   const randomPuzzle = puzzleIds[randomIndex];
-//   return "/puzzles/" + randomPuzzle;
-// };
 
 const Header = async () => {
   return (
