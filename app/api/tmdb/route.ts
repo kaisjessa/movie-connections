@@ -14,7 +14,6 @@ export async function GET(request: Request): Promise<Response> {
     }
     const { searchParams } = new URL(request.url);
     const userQuery = searchParams.get("query");
-    console.log(userQuery);
     if (!userQuery) {
       throw Error("Missing query parameter");
     }
