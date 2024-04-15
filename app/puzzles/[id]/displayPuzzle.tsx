@@ -94,7 +94,7 @@ const FoundComponent = (props: {
                 key={j}
                 className="border-4 border-transparent opacity-20 rounded"
               >
-                <PuzzlePiece movie={m} solved={false} />
+                <PuzzlePiece movie={m} solved={true} />
               </button>
             ))}
           <div className="absolute w-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-black">
@@ -121,7 +121,7 @@ const PuzzleComponent = (props: {
   setSelected: Function;
 }) => {
   const variants = {
-    clicked: { opacity: 0.5, scale: 1 },
+    clicked: { opacity: 0.2, scale: 1 },
     unclicked: { opacity: 1, scale: 1 },
   };
   return (
@@ -220,8 +220,9 @@ const ButtonsComponent = (props: {
 const PuzzlePiece = (props: { movie: Movie; solved: boolean }) => {
   const [loading, setLoading]: [boolean, any] = useState(true);
   return (
-    <div className=" w-full h-auto ">
+    <figure className="h-auto w-auto">
       {loading && <span className="loading loading-dots loading-xs"></span>}
+
       <Image
         className="rounded-lg h-auto"
         draggable={false}
@@ -230,9 +231,19 @@ const PuzzlePiece = (props: { movie: Movie; solved: boolean }) => {
         width={props.solved ? 90 : 100}
         height={props.solved ? 90 : 100}
         onLoad={() => setLoading(false)}
+        style={{ width: "128px", height: "auto" }}
       />
-      {/* <p className="text-xs text-center">{props.movie.title}</p> */}
-    </div>
+
+      <figcaption
+        className={
+          props.solved
+            ? "hidden"
+            : "max-w-24 overflow-hidden whitespace-nowrap text-ellipsis text-xs"
+        }
+      >
+        {props.movie.title}
+      </figcaption>
+    </figure>
   );
 };
 
