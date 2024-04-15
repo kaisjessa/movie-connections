@@ -24,18 +24,18 @@ import { motion } from "framer-motion";
 //   return a.every((v) => b.includes(v)) && b.every((v) => a.includes(v));
 // };
 
-const updateSelected = (selected: string[], title: string): string[] => {
-  if (selected.includes(title)) return selected.filter((i) => i !== title);
+const updateSelected = (selected: number[], movieId: number): number[] => {
+  if (selected.includes(movieId)) return selected.filter((i) => i !== movieId);
   if (selected.length === 4) return selected;
-  return [...selected, title];
+  return [...selected, movieId];
 };
 
-const arrayCount = (a: string[], b: string[]) => {
+const arrayCount = (a: any[], b: any[]) => {
   return a.filter((i) => b.includes(i)).length;
 };
 
 const checkCorrect = (
-  selected: string[],
+  selected: number[],
   contents: PuzzleContents
 ): [number, { category: string; movies: Movie[] }, number[]] => {
   let bestMatch = contents[0];
@@ -44,7 +44,7 @@ const checkCorrect = (
   for (let i = 0; i < contents.length; i++) {
     const c = contents[i];
     const category = c.category;
-    const movies = c.movies.map((m) => m.title);
+    const movies = c.movies.map((m) => m.id);
     if (arrayCount(selected, movies) > bestCount) {
       bestCount = arrayCount(selected, movies);
       bestMatch = c;
@@ -117,7 +117,7 @@ const FoundComponent = (props: {
 const PuzzleComponent = (props: {
   isLoaded: boolean;
   movieOrder: Movie[];
-  selected: string[];
+  selected: number[];
   setSelected: Function;
 }) => {
   const variants = {
@@ -133,7 +133,7 @@ const PuzzleComponent = (props: {
               layout
               initial={{ opacity: 0, scale: 0.2 }}
               animate={
-                props.selected.includes(movie.title) ? "clicked" : "unclicked"
+                props.selected.includes(movie.id) ? "clicked" : "unclicked"
               }
               variants={variants}
               transition={{
@@ -141,9 +141,9 @@ const PuzzleComponent = (props: {
                 type: "spring",
               }}
               className={"rounded-md border-4 border-transparent"}
-              key={movie.title}
+              key={movie.id}
               onClick={() =>
-                props.setSelected(updateSelected(props.selected, movie.title))
+                props.setSelected(updateSelected(props.selected, movie.id))
               }
             >
               <PuzzlePiece movie={movie} solved={false} />
@@ -162,7 +162,7 @@ const ButtonsComponent = (props: {
   setSelected: any;
   puzzleContents: PuzzleContents;
   categoriesFound: string[];
-  selected: string[];
+  selected: number[];
 }) => {
   return (
     <div id="buttons">
@@ -231,6 +231,7 @@ const PuzzlePiece = (props: { movie: Movie; solved: boolean }) => {
         height={props.solved ? 90 : 100}
         onLoad={() => setLoading(false)}
       />
+      {/* <p className="text-xs text-center">{props.movie.title}</p> */}
     </div>
   );
 };
@@ -331,7 +332,7 @@ const DisplayPuzzle = (props: { data: Puzzle }) => {
   const [isLoaded, setIsLoaded]: [boolean, any] = useState(false);
   const [isGameOver, setIsGameOver]: [boolean, any] = useState(false);
   const [movieOrder, setMovieOrder]: [Movie[], any] = useState([]);
-  const [selected, setSelected]: [string[], any] = useState([]);
+  const [selected, setSelected]: [number[], any] = useState([]);
   const [categoriesFound, setCategoriesFound]: [string[], any] = useState([]);
   const [moviesFound, setMoviesFound]: [Movie[], any] = useState([]);
   const [emojiStrings, setEmojiStrings]: [string[], any] = useState([]);
