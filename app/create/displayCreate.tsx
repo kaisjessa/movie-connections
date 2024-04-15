@@ -23,7 +23,7 @@ const Poster = (props: { movie: Movie }) => {
       <Image
         className="rounded-lg h-auto"
         draggable={false}
-        src={props.movie.poster}
+        src={props.movie.poster || "/placeholder.jpg"}
         alt={props.movie.title}
         width={100}
         height={100}
@@ -91,7 +91,7 @@ const MovieField = (props: { func: Function }) => {
               <button onClick={() => onSelection(m)}>
                 <Image
                   className="rounded-lg h-auto"
-                  src={m.poster}
+                  src={m.poster || "/placeholder.jpg"}
                   alt={m.title}
                   width={50}
                   height={50}

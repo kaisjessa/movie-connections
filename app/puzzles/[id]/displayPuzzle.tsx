@@ -225,7 +225,7 @@ const PuzzlePiece = (props: { movie: Movie; solved: boolean }) => {
       <Image
         className="rounded-lg h-auto"
         draggable={false}
-        src={props.movie.poster}
+        src={props.movie.poster || "/placeholder.jpg"}
         alt={props.movie.title}
         width={props.solved ? 90 : 100}
         height={props.solved ? 90 : 100}

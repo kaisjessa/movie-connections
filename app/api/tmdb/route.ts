@@ -18,7 +18,7 @@ export async function GET(request: Request): Promise<Response> {
     }
     const { searchParams } = new URL(request.url);
     const userQuery = searchParams.get("query");
-    if (!userQuery) {
+    if (!userQuery || userQuery.length === 0) {
       throw Error("Missing query parameter");
     }
     const baseUrl = "https://image.tmdb.org/t/p/w500";
@@ -30,8 +30,8 @@ export async function GET(request: Request): Promise<Response> {
       movies.push({
         id: movie.id,
         title: movie.title,
-        backdrop: baseUrl + movie.backdrop_path,
-        poster: baseUrl + movie.poster_path,
+        backdrop: movie.backdrop_path ? baseUrl + movie.backdrop_path : "",
+        poster: movie.poster_path ? baseUrl + movie.poster_path : "",
         year: parseInt(movie.release_date.slice(0, 4)),
       });
     }
