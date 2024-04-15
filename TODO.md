@@ -7,7 +7,12 @@
 - [x] change home page to browse
 - [x] unit/integration tests
 - [x] create puzzle with TMDB API
-- [ ] upload puzzle to firestore
+- [x] upload puzzle to firestore
 - [ ] display movie titles
+- [ ] better image/text load on dropdown
 - [ ] better movie select animation
 - [ ] UI for md+
+- [ ] auto-generated daily challenge
+- [ ] backend validation before post
+- [ ] placeholder poster
+- [ ] alternate title support

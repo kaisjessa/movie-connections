@@ -165,8 +165,6 @@ const DisplayCreate = () => {
 
   useEffect(() => {
     determineValid(categoryArray, movieArray, title, author, setErrMessage);
-    console.log(categoryArray, movieArray, title, author);
-    console.log(errMessage);
   }, [categoryArray, movieArray, title, author, errMessage]);
 
   return (

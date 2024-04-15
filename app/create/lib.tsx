@@ -146,7 +146,7 @@ export const FormSubmission = (props: {
       const submitData = formToPuzzle(name, author, categories, movies);
       // const submitData = sampleData as Puzzle;
       try {
-        const res = await fetch("http://localhost:3000/api/tmdb", {
+        const res = await fetch("/api/tmdb", {
           method: "POST",
           body: JSON.stringify(submitData),
           headers: {
