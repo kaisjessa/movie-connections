@@ -220,7 +220,7 @@ const ButtonsComponent = (props: {
 const PuzzlePiece = (props: { movie: Movie; solved: boolean }) => {
   const [loading, setLoading]: [boolean, any] = useState(true);
   return (
-    <div className="w-full h-auto">
+    <div className=" w-full h-auto ">
       {loading && <span className="loading loading-dots loading-xs"></span>}
       <Image
         className="rounded-lg"

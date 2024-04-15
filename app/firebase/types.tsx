@@ -1,4 +1,5 @@
 import { DocumentReference, Timestamp } from "firebase/firestore";
+import { NextResponse } from "next/server";
 
 export type Movie = {
   id: number;

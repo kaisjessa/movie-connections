@@ -1,4 +1,4 @@
-- [ ] game animations
+- [x] game animations
 - [x] right/wrong/1 away popups
 - [x] game over popup w/ copy-paste
 - [x] store guess squares
@@ -7,3 +7,4 @@
 - [x] change home page to browse
 - [x] unit/integration tests
 - [ ] create puzzle with TMDB API
+- [ ] display movie titles

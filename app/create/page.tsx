@@ -1,7 +1,9 @@
 import React from "react";
 import { setPuzzle } from "../firebase/lib";
 import sampleData from "../../data/sample2";
-import { Puzzle } from "../firebase/types";
+import { Movie, Puzzle } from "../firebase/types";
+import { getData } from "../tmdb/config";
+import DisplayCreate from "./displayCreate";
 
 const setSamplePuzzle = async () => {
   // open json file
@@ -10,9 +12,22 @@ const setSamplePuzzle = async () => {
   return id;
 };
 
-const Create = () => {
-  // const id = setSamplePuzzle();
-  return <div>Coming soon...</div>;
+const MovieField = async (props: { row: number; col: number }) => {
+  return (
+    <input
+      type="text"
+      placeholder={props.row.toString() + "-" + props.col.toString()}
+      className="input input-bordered input-xs w-full max-w-xs"
+    />
+  );
 };
+
+async function Create() {
+  return (
+    <div>
+      <DisplayCreate />
+    </div>
+  );
+}
 
 export default Create;
