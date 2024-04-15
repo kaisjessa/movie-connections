@@ -1,10 +1,19 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { Movie } from "../firebase/types";
+import React, { SyntheticEvent, useEffect, useState } from "react";
+import { Movie, Puzzle } from "../firebase/types";
 import Image from "next/image";
-import { Bounce, ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { unstable_noStore as noStore } from "next/cache";
+import {
+  determineValid,
+  FormSubmission,
+  formToPuzzle,
+  updateCategoryAtI,
+  updateMoviesAtI,
+} from "./lib";
+import sampleData from "../../data/sample2";
+import { useRouter } from "next/navigation";
 
 const Poster = (props: { movie: Movie }) => {
   const [loading, setLoading]: [boolean, any] = useState(true);
@@ -12,7 +21,7 @@ const Poster = (props: { movie: Movie }) => {
     <div className=" w-full h-auto">
       {loading && <span className="loading loading-dots loading-xs"></span>}
       <Image
-        className="rounded-lg"
+        className="rounded-lg h-auto"
         draggable={false}
         src={props.movie.poster}
         alt={props.movie.title}
@@ -80,7 +89,13 @@ const MovieField = (props: { func: Function }) => {
           data.map((m, i) => (
             <li key={i}>
               <button onClick={() => onSelection(m)}>
-                <Image src={m.poster} alt={m.title} width={50} height={50} />
+                <Image
+                  className="rounded-lg h-auto"
+                  src={m.poster}
+                  alt={m.title}
+                  width={50}
+                  height={50}
+                />
                 {m.title} {m.year ? "(" + m.year + ")" : ""}
               </button>
             </li>
@@ -96,7 +111,6 @@ const MoviesBox = (props: {
   setMovies: Function;
   allSelections: Movie[][];
 }) => {
-  console.log(props.allSelections[props.row - 1]);
   const colours = [
     "border-blue-400",
     "border-green-400",
@@ -136,6 +150,7 @@ const MoviesBox = (props: {
 };
 
 const DisplayCreate = () => {
+  const router = useRouter();
   const [movieArray, setMovieArray]: [Movie[][], any] = useState(
     new Array(4).fill([])
   );
@@ -149,84 +164,11 @@ const DisplayCreate = () => {
   );
 
   useEffect(() => {
-    if (title.length === 0) {
-      setErrMessage("Error: Title cannot be empty");
-    } else if (author.length === 0) {
-      setErrMessage("Error: Your name cannot be empty");
-    } else if (
-      categoryArray.length < 4 ||
-      categoryArray.includes("") ||
-      new Set(categoryArray).size != categoryArray.length
-    )
-      setErrMessage("Error: Categories cannot be empty or repeat");
-    else if (
-      movieArray.flat().map((m) => m?.id).length < 16 ||
-      movieArray
-        .flat()
-        .map((m) => m?.id)
-        .some((el) => !el || el == undefined || el == null) ||
-      new Set(movieArray.flat().map((m) => m?.id)).size !=
-        movieArray.flat().length
-    )
-      setErrMessage("Error: Movies cannot be empty or repeat");
-    else setErrMessage("");
+    determineValid(categoryArray, movieArray, title, author, setErrMessage);
+    console.log(categoryArray, movieArray, title, author);
     console.log(errMessage);
   }, [categoryArray, movieArray, title, author, errMessage]);
 
-  const updateCategoryAtI = (i: number) => {
-    const updateCategories = (c: string) => {
-      setCategoryArray(categoryArray.map((cc, ii) => (ii == i ? c : cc)));
-    };
-    return updateCategories;
-  };
-  const updateMoviesAtI = (i: number) => {
-    const selections = movieArray[i];
-    const updateMovies = (m: Movie, add: boolean) => {
-      if (!add) {
-        setMovieArray(
-          movieArray.map((row, j) => row.filter((mm) => mm.id != m.id))
-        );
-      } else {
-        if (
-          movieArray
-            .flat()
-            .map((mm) => mm.id)
-            .includes(m.id)
-        ) {
-          toast.error("Movie already added!", {
-            position: "top-center",
-            autoClose: 1000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: false,
-            progress: 0,
-            theme: "colored",
-            transition: Bounce,
-          });
-        } else if (selections.length == 4) {
-          toast.error("Category is full!", {
-            position: "top-center",
-            autoClose: 1000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: false,
-            progress: 0,
-            theme: "colored",
-            transition: Bounce,
-          });
-          return;
-        } else {
-          setMovieArray(
-            movieArray.map((row, j) => (j == i ? [...row, m] : row))
-          );
-        }
-      }
-    };
-
-    return updateMovies;
-  };
   return (
     <div className="flex flex-col items-center justify-center relative rounded">
       <ToastContainer />
@@ -256,23 +198,20 @@ const DisplayCreate = () => {
           <MoviesBox
             key={i}
             row={i}
-            setCat={updateCategoryAtI(i - 1)}
-            setMovies={updateMoviesAtI(i - 1)}
+            setCat={updateCategoryAtI(i - 1, categoryArray, setCategoryArray)}
+            setMovies={updateMoviesAtI(i - 1, movieArray, setMovieArray)}
             allSelections={movieArray}
           />
         ))}
       </div>
-      <div>
-        <button
-          className={
-            errMessage.length === 0
-              ? "btn btn-secondary justify-center items-center"
-              : "btn btn-disabled justify-center items-center"
-          }
-        >
-          Submit
-        </button>
-      </div>
+      <FormSubmission
+        title={title}
+        author={author}
+        categoryArray={categoryArray}
+        movieArray={movieArray}
+        errMessage={errMessage}
+        router={router}
+      />
     </div>
   );
 };

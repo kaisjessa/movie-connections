@@ -4,7 +4,6 @@ const sampleData = {
   header: {
     name: "My first puzzle",
     author: "Kais",
-    timestamp: serverTimestamp(),
   },
   contents: [
     {

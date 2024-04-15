@@ -1,5 +1,9 @@
 import { TMDB } from "tmdb-ts";
-import { Movie } from "../../firebase/types";
+import { Movie, Puzzle } from "../../firebase/types";
+import { redirect } from "next/navigation";
+import { setPuzzle } from "@/app/firebase/lib";
+import sampleData from "@/data/sample2";
+import { Timestamp } from "firebase/firestore";
 
 const apiKey = process.env.TMDB_API_KEY;
 const tmdb = new TMDB(apiKey!);
@@ -35,5 +39,35 @@ export async function GET(request: Request): Promise<Response> {
   } catch (err) {
     console.log(err);
     return new Response(JSON.stringify([err]));
+  }
+}
+
+export async function navigate(data: FormData) {
+  redirect(`/puzzles/${data.get("id")}`);
+}
+
+export async function POST(request: Request): Promise<Response> {
+  try {
+    const data = await request.json();
+    if (
+      !data ||
+      !data.header ||
+      !data.contents!! ||
+      !data.header.name ||
+      !data.header.author
+    ) {
+      throw Error("Missing data");
+    }
+    data.header.timestamp = Timestamp.now();
+    const id = await setPuzzle(data);
+    return new Response(JSON.stringify({ id }));
+  } catch (err) {
+    console.log(err);
+    return new Response(JSON.stringify([err]), {
+      status: 500,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   }
 }

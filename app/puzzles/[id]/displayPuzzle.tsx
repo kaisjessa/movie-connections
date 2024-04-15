@@ -223,7 +223,7 @@ const PuzzlePiece = (props: { movie: Movie; solved: boolean }) => {
     <div className=" w-full h-auto ">
       {loading && <span className="loading loading-dots loading-xs"></span>}
       <Image
-        className="rounded-lg"
+        className="rounded-lg h-auto"
         draggable={false}
         src={props.movie.poster}
         alt={props.movie.title}

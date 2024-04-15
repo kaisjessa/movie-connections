@@ -6,7 +6,8 @@
 - [x] fix browse in prod
 - [x] change home page to browse
 - [x] unit/integration tests
-- [ ] create puzzle with TMDB API
+- [x] create puzzle with TMDB API
+- [ ] upload puzzle to firestore
 - [ ] display movie titles
 - [ ] better movie select animation
 - [ ] UI for md+

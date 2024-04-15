@@ -7,8 +7,15 @@ import {
   orderBy,
   limit,
   addDoc,
+  serverTimestamp,
+  Timestamp,
 } from "firebase/firestore";
-import { Puzzle, PuzzleHeader } from "@/app/firebase/types";
+import {
+  Movie,
+  Puzzle,
+  PuzzleContents,
+  PuzzleHeader,
+} from "@/app/firebase/types";
 import { firebase_db } from "@/app/firebase/config";
 
 // gets all puzzle header data from firebase
@@ -29,12 +36,12 @@ export const getPuzzleHeaders = async (
   return puzzleHeaders;
 };
 
-// TODO: setPuzzle for /create
 export const setPuzzle = async (puzzle: Puzzle): Promise<string> => {
   const docRef = await addDoc(collection(firebase_db, "puzzles"), {
     header: puzzle.header,
     contents: puzzle.contents,
   });
+  console.log("success", docRef.id.toString());
   return docRef.id;
 };
 
