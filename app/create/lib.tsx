@@ -135,7 +135,6 @@ export const FormSubmission = (props: {
       e.preventDefault();
       toast.info("Saving puzzle...", {
         position: "top-center",
-        autoClose: 1000,
         hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: false,
@@ -164,7 +163,6 @@ export const FormSubmission = (props: {
         } else {
           toast.error("An error occured :(", {
             position: "top-center",
-            autoClose: 1000,
             hideProgressBar: true,
             closeOnClick: true,
             pauseOnHover: false,
@@ -177,7 +175,6 @@ export const FormSubmission = (props: {
       } catch (error) {
         toast.error((error as any).toString(), {
           position: "top-center",
-          autoClose: 1000,
           hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: false,
@@ -199,15 +196,24 @@ export const FormSubmission = (props: {
         props.movieArray
       )}
     >
-      <button
+      <div
         className={
           props.errMessage.length === 0
-            ? "btn btn-primary justify-center items-center"
-            : "btn btn-disabled justify-center items-center"
+            ? ""
+            : "tooltip focus:tooltip-open tooltip-error"
         }
+        data-tip={props.errMessage}
       >
-        Submit
-      </button>
+        <button
+          className={
+            props.errMessage.length === 0
+              ? "btn btn-primary justify-center items-center"
+              : "btn btn-disabled justify-center items-center"
+          }
+        >
+          Submit
+        </button>
+      </div>
     </form>
   );
 };
