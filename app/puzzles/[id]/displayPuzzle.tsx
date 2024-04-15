@@ -10,7 +10,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Bounce, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
+import { motion } from "framer-motion";
 
 // const shuffle = (array: Movie[]) => {
 //   for (let i = array.length - 1; i > 0; i--) {
@@ -20,15 +20,15 @@ import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
 //   return array;
 // };
 
+// const arraysEqual = (a: string[], b: string[]) => {
+//   return a.every((v) => b.includes(v)) && b.every((v) => a.includes(v));
+// };
+
 const updateSelected = (selected: string[], title: string): string[] => {
   if (selected.includes(title)) return selected.filter((i) => i !== title);
   if (selected.length === 4) return selected;
   return [...selected, title];
 };
-
-// const arraysEqual = (a: string[], b: string[]) => {
-//   return a.every((v) => b.includes(v)) && b.every((v) => a.includes(v));
-// };
 
 const arrayCount = (a: string[], b: string[]) => {
   return a.filter((i) => b.includes(i)).length;
@@ -70,9 +70,16 @@ const FoundComponent = (props: {
       {props.categoriesFound.map((c, i) => (
         <motion.div
           layout
-          initial={{ opacity: 0, scale: 0.2 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, type: "spring" }}
+          initial={{ opacity: 0, scale: 1 }}
+          animate={{
+            opacity: 1,
+            scale: [0, 1.0],
+          }}
+          transition={{
+            duration: 1.5,
+            type: "spring",
+            bounce: 0.5,
+          }}
           key={i}
           className={`${
             props.colours[props.categories.indexOf(c)]
@@ -87,12 +94,20 @@ const FoundComponent = (props: {
                 key={j}
                 className="border-4 border-transparent opacity-20 rounded"
               >
-                <PuzzlePiece movie={m} />
+                <PuzzlePiece movie={m} solved={false} />
               </button>
             ))}
-          <h2 className="absolute inset-0 top-1/2 mt-3 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-black text-xl font-bold">
-            {c}
-          </h2>
+          <div className="absolute w-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-black">
+            <h2 className="text-xl font-bold">{c}</h2>
+            <div className="text-md">
+              {props.puzzleContents
+                .filter((cc) => cc.category == c)
+                .map((c) => c.movies)
+                .flat()
+                .map((m) => m.title)
+                .join(", ")}
+            </div>
+          </div>
         </motion.div>
       ))}
     </div>
@@ -105,28 +120,34 @@ const PuzzleComponent = (props: {
   selected: string[];
   setSelected: Function;
 }) => {
+  const variants = {
+    clicked: { opacity: 0.5, scale: 1 },
+    unclicked: { opacity: 1, scale: 1 },
+  };
   return (
     <div id="puzzle" className="grid grid-cols-4 grid-flow-row rounded">
       {props.isLoaded &&
         props.movieOrder.map(function (movie: Movie, id: number) {
           return (
-            <motion.button
+            <motion.div
               layout
               initial={{ opacity: 0, scale: 0.2 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.7, type: "spring" }}
-              className={
-                props.selected.includes(movie.title)
-                  ? "rounded-md border-4 border-rose-500"
-                  : "rounded-md border-4 border-transparent"
+              animate={
+                props.selected.includes(movie.title) ? "clicked" : "unclicked"
               }
+              variants={variants}
+              transition={{
+                duration: 0.7,
+                type: "spring",
+              }}
+              className={"rounded-md border-4 border-transparent"}
               key={movie.title}
               onClick={() =>
                 props.setSelected(updateSelected(props.selected, movie.title))
               }
             >
-              <PuzzlePiece movie={movie} />
-            </motion.button>
+              <PuzzlePiece movie={movie} solved={false} />
+            </motion.div>
           );
         })}
       {props.isLoaded || <PuzzleLoading />}
@@ -196,17 +217,18 @@ const ButtonsComponent = (props: {
   );
 };
 
-const PuzzlePiece = (props: { movie: Movie }) => {
+const PuzzlePiece = (props: { movie: Movie; solved: boolean }) => {
   const [loading, setLoading]: [boolean, any] = useState(true);
   return (
     <div className="w-full h-auto">
       {loading && <span className="loading loading-dots loading-xs"></span>}
       <Image
         className="rounded-lg"
+        draggable={false}
         src={props.movie.poster}
         alt={props.movie.title}
-        width={100}
-        height={100}
+        width={props.solved ? 90 : 100}
+        height={props.solved ? 90 : 100}
         onLoad={() => setLoading(false)}
       />
     </div>
@@ -261,6 +283,7 @@ const ModalComponent = (props: {
 };
 
 const PuzzleLoading = () => {
+  // return <p>Loading...</p>;
   return (
     <>
       <p>Loading...</p>
