@@ -1,13 +1,16 @@
 "use client";
 import React from "react";
-import { Movie, Puzzle, PuzzleContents } from "../../firebase/types";
-import { Timestamp } from "firebase/firestore";
+import {
+  Movie,
+  Puzzle,
+  PuzzleContents,
+  PuzzleHeader,
+} from "../../firebase/types";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Bounce, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { BsWindowSidebar } from "react-icons/bs";
-import Link from "next/link";
+import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
 
 // const shuffle = (array: Movie[]) => {
 //   for (let i = array.length - 1; i > 0; i--) {
@@ -23,9 +26,9 @@ const updateSelected = (selected: string[], title: string): string[] => {
   return [...selected, title];
 };
 
-const arraysEqual = (a: string[], b: string[]) => {
-  return a.every((v) => b.includes(v)) && b.every((v) => a.includes(v));
-};
+// const arraysEqual = (a: string[], b: string[]) => {
+//   return a.every((v) => b.includes(v)) && b.every((v) => a.includes(v));
+// };
 
 const arrayCount = (a: string[], b: string[]) => {
   return a.filter((i) => b.includes(i)).length;
@@ -53,6 +56,146 @@ const checkCorrect = (
   return [bestCount, bestMatch, categoriesGuessed];
 };
 
+const FoundComponent = (props: {
+  categoriesFound: string[];
+  colours: string[];
+  puzzleContents: PuzzleContents;
+  categories: string[];
+}) => {
+  return (
+    <div
+      id="found"
+      className="grid grid-cols-4 grid-flow-row pb-1 relative rounded"
+    >
+      {props.categoriesFound.map((c, i) => (
+        <motion.div
+          layout
+          initial={{ opacity: 0, scale: 0.2 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.7, type: "spring" }}
+          key={i}
+          className={`${
+            props.colours[props.categories.indexOf(c)]
+          } relative col-span-4 grid grid-rows-1 grid-flow-col rounded`}
+        >
+          {props.puzzleContents
+            .filter((cc) => cc.category == c)
+            .map((c) => c.movies)
+            .flat()
+            .map((m, j) => (
+              <button
+                key={j}
+                className="border-4 border-transparent opacity-20 rounded"
+              >
+                <PuzzlePiece movie={m} />
+              </button>
+            ))}
+          <h2 className="absolute inset-0 top-1/2 mt-3 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-black text-xl font-bold">
+            {c}
+          </h2>
+        </motion.div>
+      ))}
+    </div>
+  );
+};
+
+const PuzzleComponent = (props: {
+  isLoaded: boolean;
+  movieOrder: Movie[];
+  selected: string[];
+  setSelected: Function;
+}) => {
+  return (
+    <div id="puzzle" className="grid grid-cols-4 grid-flow-row rounded">
+      {props.isLoaded &&
+        props.movieOrder.map(function (movie: Movie, id: number) {
+          return (
+            <motion.button
+              layout
+              initial={{ opacity: 0, scale: 0.2 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7, type: "spring" }}
+              className={
+                props.selected.includes(movie.title)
+                  ? "rounded-md border-4 border-rose-500"
+                  : "rounded-md border-4 border-transparent"
+              }
+              key={movie.title}
+              onClick={() =>
+                props.setSelected(updateSelected(props.selected, movie.title))
+              }
+            >
+              <PuzzlePiece movie={movie} />
+            </motion.button>
+          );
+        })}
+      {props.isLoaded || <PuzzleLoading />}
+    </div>
+  );
+};
+
+const ButtonsComponent = (props: {
+  isGameOver: boolean;
+  onSubmit: any;
+  setMovieOrder: Function;
+  setSelected: any;
+  puzzleContents: PuzzleContents;
+  categoriesFound: string[];
+  selected: string[];
+}) => {
+  return (
+    <div id="buttons">
+      <button
+        className={
+          props.isGameOver ? "hidden" : "btn btn-accent m-1 btn-outline"
+        }
+        onClick={() => {
+          props.setMovieOrder(
+            props.puzzleContents
+              .filter((c) => !props.categoriesFound.includes(c.category))
+              .map((c) => c.movies)
+              .flat()
+              .slice()
+              .sort(() => Math.random() - 0.5)
+          );
+        }}
+      >
+        Shuffle
+      </button>
+      <button
+        className={
+          props.isGameOver ? "hidden" : "btn btn-secondary m-1 btn-outline"
+        }
+        onClick={() => props.setSelected([])}
+      >
+        Deselect All
+      </button>
+      <button
+        className={
+          props.isGameOver
+            ? "hidden"
+            : props.selected.length === 4
+            ? "btn btn-primary m-1 "
+            : "btn btn-outline btn-disabled m-1"
+        }
+        onClick={props.onSubmit}
+      >
+        Submit
+      </button>
+      <button
+        className={
+          props.isGameOver ? "btn btn-outline btn-primary m-1 " : "hidden"
+        }
+        onClick={() => {
+          openModal();
+        }}
+      >
+        View results
+      </button>
+    </div>
+  );
+};
+
 const PuzzlePiece = (props: { movie: Movie }) => {
   const [loading, setLoading]: [boolean, any] = useState(true);
   return (
@@ -67,6 +210,53 @@ const PuzzlePiece = (props: { movie: Movie }) => {
         onLoad={() => setLoading(false)}
       />
     </div>
+  );
+};
+
+const ModalComponent = (props: {
+  emojiStrings: string[];
+  puzzleHeader: PuzzleHeader;
+  dateOptions: { [key: string]: any };
+}) => {
+  return (
+    <dialog id="user_results" className="modal modal-bottom sm:modal-middle">
+      <div className="modal-box">
+        <form method="dialog">
+          {/* if there is a button in form, it will close the modal */}
+          <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+            ✕
+          </button>
+        </form>
+
+        <h2 className="font-bold text-3xl pb-4">Share your results!</h2>
+        <div id="modal-content" className="pl-2 text-center">
+          <span className="text-lg font-bold">{props.puzzleHeader.name} </span>
+          <span className="text-sm font-bold">
+            by {props.puzzleHeader.author}
+          </span>
+          <div className="text-xs">
+            Played{" "}
+            {new Date().toLocaleString("en-US", props.dateOptions as any)}
+          </div>
+          {props.emojiStrings.map((c, i) => (
+            <div key={i} className="text-3xl">
+              {c}
+            </div>
+          ))}
+        </div>
+
+        <div className="modal-action justify-center">
+          <button
+            className="btn btn-outline btn-wide"
+            onClick={() => {
+              copyModal();
+            }}
+          >
+            Copy results
+          </button>
+        </div>
+      </div>
+    </dialog>
   );
 };
 
@@ -205,100 +395,27 @@ const DisplayPuzzle = (props: { data: Puzzle }) => {
   return (
     <div className="flex flex-col items-center justify-center relative rounded">
       <ToastContainer />
-      <div
-        id="found"
-        className="grid grid-cols-4 grid-flow-row pb-1 relative rounded"
-      >
-        {categoriesFound.map((c, i) => (
-          <div
-            key={i}
-            className={`${
-              colours[categories.indexOf(c)]
-            } relative col-span-4 grid grid-rows-1 grid-flow-col rounded`}
-          >
-            {puzzleContents
-              .filter((cc) => cc.category == c)
-              .map((c) => c.movies)
-              .flat()
-              .map((m, j) => (
-                <button
-                  key={j}
-                  className="border-4 border-transparent opacity-20 rounded"
-                >
-                  <PuzzlePiece movie={m} />
-                </button>
-              ))}
-            <h2 className="absolute inset-0 top-1/2 mt-3 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-black text-xl font-bold">
-              {c}
-            </h2>
-          </div>
-        ))}
-      </div>
-      <div id="puzzle" className="grid grid-cols-4 grid-flow-row rounded">
-        {isLoaded &&
-          movieOrder.map(function (movie: Movie, id: number) {
-            return (
-              <button
-                className={
-                  selected.includes(movie.title)
-                    ? "rounded-md border-4 border-rose-500"
-                    : "rounded-md border-4 border-transparent"
-                }
-                key={id}
-                onClick={() =>
-                  setSelected(updateSelected(selected, movie.title))
-                }
-              >
-                <PuzzlePiece movie={movie} />
-              </button>
-            );
-          })}
-        {isLoaded || <PuzzleLoading />}
-      </div>
-      <div id="buttons">
-        <button
-          className="btn btn-accent m-1 btn-outline"
-          onClick={() => {
-            setSelected([]);
-            setMovieOrder(
-              puzzleContents
-                .filter((c) => !categoriesFound.includes(c.category))
-                .map((c) => c.movies)
-                .flat()
-                .slice()
-                .sort(() => Math.random() - 0.5)
-            );
-          }}
-        >
-          Shuffle
-        </button>
-        <button
-          className="btn btn-secondary m-1 btn-outline"
-          onClick={() => setSelected([])}
-        >
-          Deselect All
-        </button>
-        <button
-          className={
-            isGameOver
-              ? "hidden"
-              : selected.length === 4
-              ? "btn btn-primary m-1 "
-              : "btn btn-outline btn-disabled m-1"
-          }
-          onClick={onSubmit}
-        >
-          Submit
-        </button>
-        <button
-          className={isGameOver ? "btn btn-outline btn-primary m-1 " : "hidden"}
-          onClick={() => {
-            openModal();
-          }}
-        >
-          View results
-        </button>
-      </div>
+      <FoundComponent
+        categoriesFound={categoriesFound}
+        colours={colours}
+        puzzleContents={puzzleContents}
+        categories={categories}
+      />
+      <PuzzleComponent
+        isLoaded={isLoaded}
+        movieOrder={movieOrder}
+        selected={selected}
+        setSelected={setSelected}
+      />
+      <ButtonsComponent
+        isGameOver={isGameOver}
+        onSubmit={onSubmit}
+        setMovieOrder={setMovieOrder}
+        setSelected={setSelected}
+        puzzleContents={puzzleContents}
+        categoriesFound={categoriesFound}
+        selected={selected}
+      />
       <div id="title" className="pl-2">
         <h1 className="text-3xl font-bold">{puzzleHeader.name}</h1>
         <h2 className="text-lg">Author: {puzzleHeader.author}</h2>
@@ -306,42 +423,11 @@ const DisplayPuzzle = (props: { data: Puzzle }) => {
           Created: {puzzleTime.toLocaleString("en-US", dateOptions as any)}
         </h3>
       </div>
-      {/* Open the modal using document.getElementById('ID').showModal() method */}
-      <dialog id="user_results" className="modal modal-bottom sm:modal-middle">
-        <div className="modal-box">
-          <form method="dialog">
-            {/* if there is a button in form, it will close the modal */}
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-              ✕
-            </button>
-          </form>
-
-          <h2 className="font-bold text-3xl pb-4">Share your results!</h2>
-          <div id="modal-content" className="pl-2 text-center">
-            <span className="text-lg font-bold">{puzzleHeader.name} </span>
-            <span className="text-sm font-bold">by {puzzleHeader.author}</span>
-            <div className="text-xs">
-              Played {new Date().toLocaleString("en-US", dateOptions as any)}
-            </div>
-            {emojiStrings.map((c, i) => (
-              <div key={i} className="text-3xl">
-                {c}
-              </div>
-            ))}
-          </div>
-
-          <div className="modal-action justify-center">
-            <button
-              className="btn btn-outline btn-wide"
-              onClick={() => {
-                copyModal();
-              }}
-            >
-              Copy results
-            </button>
-          </div>
-        </div>
-      </dialog>
+      <ModalComponent
+        emojiStrings={emojiStrings}
+        puzzleHeader={puzzleHeader}
+        dateOptions={dateOptions}
+      />
     </div>
   );
 };

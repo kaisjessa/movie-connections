@@ -17,7 +17,6 @@ export const getPuzzleHeaders = async (
 ): Promise<PuzzleHeader[]> => {
   const puzzleRef = collection(firebase_db, "puzzles");
   const q = query(puzzleRef, orderBy("header.timestamp", "desc"), limit(25));
-  // const q = query(puzzleRef);
   const querySnapshot = await getDocs(q);
   const puzzleHeaders = querySnapshot.docs.map((p) => {
     return {
