@@ -9,7 +9,7 @@
 - [x] create puzzle with TMDB API
 - [x] upload puzzle to firestore
 - [x] display movie titles
-- [ ] better image/text load on dropdown
+- [x] better image/text load on dropdown
 - [ ] better movie select animation
 - [ ] UI for md+
 - [ ] auto-generated daily challenge
@@ -17,9 +17,11 @@
 - [ ] placeholder poster
 - [ ] alternate title support
 - [ ] add analytics
-- [ ] update README
+- [x] update README
 - [ ] web icon
 - [ ] optimize embed previews
+- [ ] fix poster lag in found-div
+- [ ] testing
 
 - [ ] improve performance
 - [ ] implement search functionality

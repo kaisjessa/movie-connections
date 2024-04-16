@@ -19,7 +19,7 @@ import { AnimatePresence, motion } from "framer-motion";
 const Poster = (props: { movie: Movie }) => {
   const [loading, setLoading]: [boolean, any] = useState(true);
   return (
-    <div className=" w-full h-auto">
+    <div className="flex items-center justify-center w-full h-auto">
       {loading && <span className="loading loading-dots loading-xs"></span>}
       <Image
         className="rounded-lg h-auto border-2 border-zinc-400 mt-3"
@@ -149,7 +149,7 @@ const MoviesBox = (props: {
         <MovieField func={props.setMovies} />
       </div>
 
-      <motion.div className="grid grid-cols-4 grid-flow-row pb-1 relative rounded">
+      <motion.div className="grid grid-cols-4 grid-flow-row pb-1 relative rounded justify-end items-end">
         <AnimatePresence>
           {props.allSelections[props.row - 1].map((m, i) => (
             <motion.button
@@ -162,14 +162,14 @@ const MoviesBox = (props: {
                 transition: { duration: 0.6, delay: 0.1, type: "easeIn" },
               }}
               exit={{
-                scale: 0.7,
-                opacity: 1,
-                rotate: -45,
-                x: -50,
-                transition: { duration: 0.1, type: "easeOut" },
+                scale: 0,
+                opacity: 0,
+                rotate: -60,
+                x: -200,
+                transition: { duration: 0.5, type: "linear" },
               }}
               key={m.id}
-              className="border-4 border-transparent rounded hover:opacity-20"
+              className="border-2 border-transparent hover:opacity-20"
               onClick={() => {
                 props.setMovies(m, false);
               }}
