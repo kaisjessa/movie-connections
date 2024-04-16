@@ -4,7 +4,7 @@
 #
 
 app = 'movie-connections'
-primary_region = 'ewr'
+primary_region = 'yyz'
 
 [build]
 
