@@ -8,7 +8,7 @@
 - [x] unit/integration tests
 - [x] create puzzle with TMDB API
 - [x] upload puzzle to firestore
-- [ ] display movie titles
+- [x] display movie titles
 - [ ] better image/text load on dropdown
 - [ ] better movie select animation
 - [ ] UI for md+
@@ -16,3 +16,5 @@
 - [ ] backend validation before post
 - [ ] placeholder poster
 - [ ] alternate title support
+- [ ] add analytics
+- [ ] update README
