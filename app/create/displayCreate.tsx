@@ -1,5 +1,5 @@
 "use client";
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
 import { Movie, Puzzle } from "../firebase/types";
 import Image from "next/image";
 import { ToastContainer } from "react-toastify";
@@ -14,6 +14,7 @@ import {
 } from "./lib";
 import sampleData from "../../data/sample2";
 import { useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 
 const Poster = (props: { movie: Movie }) => {
   const [loading, setLoading]: [boolean, any] = useState(true);
@@ -21,7 +22,7 @@ const Poster = (props: { movie: Movie }) => {
     <div className=" w-full h-auto">
       {loading && <span className="loading loading-dots loading-xs"></span>}
       <Image
-        className="rounded-lg h-auto"
+        className="rounded-lg h-auto border-2 border-zinc-400 mt-3"
         draggable={false}
         src={props.movie.poster || "/placeholder.jpg"}
         alt={props.movie.title}
@@ -54,14 +55,17 @@ const MovieField = (props: { func: Function }) => {
   const [data, setData]: [Movie[], any] = useState([]);
   useEffect(() => {
     const getData = async () => {
+      // setData([]);
+      // await new Promise((r) => setTimeout(r, 2000));
       if (userSearch.length === 0) {
         setData([]);
         return;
       }
       noStore();
       const movieData = await fetch(`/api/tmdb?query=${userSearch}`);
-      const movies = await movieData.json();
-      setData(movies);
+      const movies: Movie[] = await movieData.json();
+      console.log(movies.slice(0, 3).map((m) => m.title));
+      setData(movies.slice(0, 3));
     };
     getData();
   }, [userSearch]);
@@ -71,9 +75,8 @@ const MovieField = (props: { func: Function }) => {
     setData([]);
     props.func(m, true);
   };
-
   return (
-    <div className="dropdown dropdown-open w-full">
+    <div className="dropdown w-full">
       <input
         type="text"
         placeholder={"Search movie titles..."}
@@ -81,26 +84,41 @@ const MovieField = (props: { func: Function }) => {
         value={userSearch}
         onChange={(e) => setUserSearch(e.target.value)}
       />
-      <ul
+      <motion.ul
         tabIndex={0}
         className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-full"
       >
-        {data.length > 0 &&
-          data.map((m, i) => (
-            <li key={i}>
-              <button onClick={() => onSelection(m)}>
-                <Image
-                  className="rounded-lg h-auto"
-                  src={m.poster || "/placeholder.jpg"}
-                  alt={m.title}
-                  width={50}
-                  height={50}
-                />
-                {m.title} {m.year ? "(" + m.year + ")" : ""}
-              </button>
-            </li>
-          ))}
-      </ul>
+        {data.length > 0 && userSearch.length > 0 && (
+          <>
+            {data.map((m, i) => (
+              <motion.li
+                layout
+                initial={{ opacity: 0, x: 100 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.2, duration: 0.7, type: "linear" }}
+                whileFocus={{ scale: 1.1 }}
+                key={m.id.toString() + "__" + i.toString()}
+                exit={{ opacity: 0, x: -100 }}
+                className="bg-neutral border border-base-100"
+              >
+                <button onClick={() => onSelection(m)}>
+                  <Image
+                    className="rounded-lg h-auto border-2 border-zinc-400"
+                    src={m.poster || "/placeholder.jpg"}
+                    alt={m.title}
+                    width={50}
+                    height={50}
+                  />
+                  {m.title} {m.year ? "(" + m.year + ")" : ""}
+                </button>
+              </motion.li>
+            ))}
+          </>
+        )}
+        {data.length === 0 && userSearch.length > 0 && (
+          <li className={"text-center"}>No results found</li>
+        )}
+      </motion.ul>
     </div>
   );
 };
@@ -131,20 +149,36 @@ const MoviesBox = (props: {
         <MovieField func={props.setMovies} />
       </div>
 
-      <div className="grid grid-cols-4 grid-flow-row pb-1 relative rounded">
-        <div className="relative col-span-4 grid grid-rows-1 grid-flow-col rounded"></div>
-        {props.allSelections[props.row - 1].map((m, i) => (
-          <button
-            key={i}
-            className="border-4 border-transparent rounded hover:opacity-20"
-            onClick={() => {
-              props.setMovies(m, false);
-            }}
-          >
-            <Poster movie={m} />
-          </button>
-        ))}
-      </div>
+      <motion.div className="grid grid-cols-4 grid-flow-row pb-1 relative rounded">
+        <AnimatePresence>
+          {props.allSelections[props.row - 1].map((m, i) => (
+            <motion.button
+              layout
+              initial={{ scale: 1, opacity: 0, x: 200 }}
+              animate={{
+                scale: 1,
+                opacity: 1,
+                x: 0,
+                transition: { duration: 0.6, delay: 0.1, type: "easeIn" },
+              }}
+              exit={{
+                scale: 0.7,
+                opacity: 1,
+                rotate: -45,
+                x: -50,
+                transition: { duration: 0.1, type: "easeOut" },
+              }}
+              key={m.id}
+              className="border-4 border-transparent rounded hover:opacity-20"
+              onClick={() => {
+                props.setMovies(m, false);
+              }}
+            >
+              <Poster movie={m} />
+            </motion.button>
+          ))}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 };

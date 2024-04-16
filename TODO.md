@@ -18,3 +18,12 @@
 - [ ] alternate title support
 - [ ] add analytics
 - [ ] update README
+- [ ] web icon
+- [ ] optimize embed previews
+
+- [ ] improve performance
+- [ ] implement search functionality
+- [ ] add user authentication
+- [ ] implement rating system
+- [ ] optimize database queries
+- [ ] add pagination for movie list
