@@ -43,8 +43,8 @@ const CategoryField = (props: { row: number; func: Function }) => {
       className="input input-bordered w-full"
       value={userSearch}
       onChange={(e) => {
-        setUserSearch(e.target.value);
-        props.func(e.target.value);
+        setUserSearch(e.target.value.substring(0, 256));
+        props.func(e.target.value.substring(0, 256));
       }}
     />
   );
@@ -213,7 +213,7 @@ const DisplayCreate = () => {
             className="input input-bordered w-full font-bold text-2xl"
             value={title}
             onChange={(e) => {
-              setTitle(e.target.value);
+              setTitle(e.target.value.substring(0, 256));
             }}
           />
           <input
@@ -222,7 +222,7 @@ const DisplayCreate = () => {
             className="input input-bordered w-full font-bold text-md"
             value={author}
             onChange={(e) => {
-              setAuthor(e.target.value);
+              setAuthor(e.target.value.substring(0, 256));
             }}
           />
         </div>

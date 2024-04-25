@@ -143,7 +143,12 @@ export const FormSubmission = (props: {
         theme: "colored",
         transition: Bounce,
       });
-      const submitData = formToPuzzle(name, author, categories, movies);
+      const submitData = formToPuzzle(
+        name.substring(0, 256),
+        author.substring(0, 256),
+        categories.map((c) => c.substring(0, 256)),
+        movies
+      );
       // const submitData = sampleData as Puzzle;
       try {
         const res = await fetch("/api/tmdb", {

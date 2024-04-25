@@ -11,7 +11,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Movie Connections",
-  description: "Movie connections",
+  description:
+    "Play trivia related to your favourite movies by grouping them into four groups of four!",
 };
 
 export default function RootLayout({

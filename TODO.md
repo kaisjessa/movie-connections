@@ -10,10 +10,10 @@
 - [x] upload puzzle to firestore
 - [x] display movie titles
 - [x] better image/text load on dropdown
-- [ ] better movie select animation
+- [x] better movie select animation
 - [ ] UI for md+
 - [ ] auto-generated daily challenge
-- [ ] backend validation before post
+- [x] backend validation before post
 - [ ] placeholder poster
 - [ ] alternate title support
 - [ ] add analytics
