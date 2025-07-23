@@ -64,7 +64,6 @@ const MovieField = (props: { func: Function }) => {
       noStore();
       const movieData = await fetch(`/api/tmdb?query=${userSearch}`);
       const movies: Movie[] = await movieData.json();
-      console.log(movies.slice(0, 3).map((m) => m.title));
       setData(movies.slice(0, 3));
     };
     getData();
