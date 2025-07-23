@@ -27,12 +27,17 @@ export async function GET(request: Request): Promise<Response> {
     let movies: Movie[] = [];
     for (let i = 0; i < Math.min(3, results.length); i++) {
       const movie = results[i];
+      if (!movie || !movie.id || !movie.title) {
+        continue;
+      }
       movies.push({
         id: movie.id,
         title: movie.title,
         backdrop: movie.backdrop_path ? baseUrl + movie.backdrop_path : "",
         poster: movie.poster_path ? baseUrl + movie.poster_path : "",
-        year: parseInt(movie.release_date.slice(0, 4)),
+        year: movie.release_date
+          ? parseInt(movie.release_date.slice(0, 4))
+          : undefined,
       });
     }
     return new Response(JSON.stringify(movies));
